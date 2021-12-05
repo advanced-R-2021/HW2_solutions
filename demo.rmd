@@ -1,0 +1,63 @@
+---
+title: "idsim Package Demonstration"
+author: "Aaron Gerding"
+date: "12/4/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(devtools)
+load_all("../idsim")
+```
+
+
+```{r}
+cum_inc_final <- simulate_trajs(
+  n_simu = 100, n_days = 30,
+  ntot = 1000,
+  n0 = 5, n_days_inf = 7,
+  prob_infect = .3
+)
+cum_inc_final %>% head(3)
+```
+```{r}
+result <- cum_inc_final %>%  
+  bind_rows(.id = "simu") %>%
+  pivot_longer(cols = -simu, names_to = "day", values_to = "cum_incidence")
+
+result_sum <- result %>%
+  group_by(day) %>%
+  summarize(
+    median1 = median(cum_incidence),
+    upper = quantile(cum_incidence, .95),
+    lower = quantile(cum_incidence, .05)
+  ) 
+```
+
+
+```{r}
+  ggplot(
+    data = result,
+    aes(x = as.integer(day), y = cum_incidence, group = simu)
+  ) +
+  geom_line(alpha=.1) +
+  geom_smooth(
+    data = result_sum, 
+    stat = "identity", 
+    aes(x = as.integer(day), y = median1, ymax = upper, ymin = lower, group = 1)) +
+  ylim(0, NA) +
+  labs(y = "Cumulative incidence", x = "Day")
+```
+We see here a sample of 100 different cumulative incidence trajectories, or "epidemic curves", under the stochastic disease model described by the function `simu_cum_incidence`.  The median and .05 and .95 lower quantiles of these 100 curves are also shown.  We can see that at least under the parameters chosen for this simulation the distribution of cumulative incidence becomes fairly skewed by 30 days.
+
+```{r}
+library(Rd2md)
+Rd2markdown(rdfile = "man/simulate_trajs.Rd",
+            outfile = "simulate_trajs.md")
+```
+
+## Help file
+```{r, child=c('simulate_trajs.md')}
+```
