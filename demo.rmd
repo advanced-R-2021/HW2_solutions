@@ -42,13 +42,14 @@ result_sum <- result %>%
     data = result,
     aes(x = as.integer(day), y = cum_incidence, group = simu)
   ) +
-  geom_line(alpha=.1) +
+  geom_line(alpha=.2) +
   geom_smooth(
     data = result_sum, 
     stat = "identity", 
     aes(x = as.integer(day), y = median1, ymax = upper, ymin = lower, group = 1)) +
   ylim(0, NA) +
-  labs(y = "Cumulative incidence", x = "Day")
+  labs(y = "Cumulative incidence", x = "Day")+
+  theme_classic()
 ```
 We see here a sample of 100 different cumulative incidence trajectories, or "epidemic curves", under the stochastic disease model described by the function `simu_cum_incidence`.  The median and .05 and .95 lower quantiles of these 100 curves are also shown.  We can see under the parameters chosen the epidemic dies out very quickly and very rarely leads to more than 15 infections and often leads to no further infections beyond the initial ones.
 
