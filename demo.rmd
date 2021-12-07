@@ -42,7 +42,7 @@ result_sum <- result %>%
     data = result,
     aes(x = as.integer(day), y = cum_incidence, group = simu)
   ) +
-  geom_line(alpha=.2) +
+  geom_line(alpha=.3) +
   geom_smooth(
     data = result_sum, 
     stat = "identity", 
